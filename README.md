@@ -82,6 +82,12 @@ npm start
 
 ---
 
+## 🚀 Deployment
+
+The backend is deployed on Render:
+
+https://content-broadcarsting-system.onrender.com
+
 ## 🔗 API Endpoints
 
 ### Auth
@@ -128,4 +134,12 @@ This ensures continuous looping without storing state.
 
 
 ## 🌐 Live API Example
-https://content-broadcarsting-system.onrender.com/content/live/1?subject=maths
+
+```http
+GET https://content-broadcarsting-system.onrender.com/content/live/1?subject=maths
+
+## ⚠️ File Storage Note
+
+Uploaded files are stored locally. Since the application is deployed on Render (which uses ephemeral storage), uploaded files may not persist after redeployment.
+
+In a production environment, cloud storage solutions like AWS S3 or Cloudinary should be used for reliable file handling.
