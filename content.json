@@ -1,0 +1,136 @@
+{
+"info": {
+"name": "Content Broadcasting API",
+"_postman_id": "12345-abcde",
+"description": "API collection for content broadcasting backend",
+"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+},
+"item": [
+
+{
+  "name": "Register",
+  "request": {
+    "method": "POST",
+    "header": [
+      { "key": "Content-Type", "value": "application/json" }
+    ],
+    "body": {
+      "mode": "raw",
+      "raw": "{\n  \"name\": \"Teacher1\",\n  \"email\": \"teacher@gmail.com\",\n  \"password\": \"1234\",\n  \"role\": \"TEACHER\"\n}"
+    },
+    "url": {
+      "raw": "http://localhost:5000/auth/register",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "5000",
+      "path": ["auth", "register"]
+    }
+  }
+},
+
+{
+  "name": "Login",
+  "request": {
+    "method": "POST",
+    "header": [
+      { "key": "Content-Type", "value": "application/json" }
+    ],
+    "body": {
+      "mode": "raw",
+      "raw": "{\n  \"email\": \"teacher@gmail.com\",\n  \"password\": \"1234\"\n}"
+    },
+    "url": {
+      "raw": "http://localhost:5000/auth/login",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "5000",
+      "path": ["auth", "login"]
+    }
+  }
+},
+
+{
+  "name": "Upload Content",
+  "request": {
+    "method": "POST",
+    "header": [
+      { "key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE" }
+    ],
+    "body": {
+      "mode": "formdata",
+      "formdata": [
+        { "key": "title", "value": "Math Lecture", "type": "text" },
+        { "key": "subject", "value": "maths", "type": "text" },
+        { "key": "start_time", "value": "2026-04-26T10:00:00", "type": "text" },
+        { "key": "end_time", "value": "2026-04-26T23:00:00", "type": "text" },
+        { "key": "file", "type": "file", "src": "" }
+      ]
+    },
+    "url": {
+      "raw": "http://localhost:5000/content/upload",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "5000",
+      "path": ["content", "upload"]
+    }
+  }
+},
+
+{
+  "name": "Approve Content",
+  "request": {
+    "method": "POST",
+    "header": [
+      { "key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE" }
+    ],
+    "url": {
+      "raw": "http://localhost:5000/approval/approve/1",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "5000",
+      "path": ["approval", "approve", "1"]
+    }
+  }
+},
+
+{
+  "name": "Reject Content",
+  "request": {
+    "method": "POST",
+    "header": [
+      { "key": "Authorization", "value": "Bearer YOUR_TOKEN_HERE" },
+      { "key": "Content-Type", "value": "application/json" }
+    ],
+    "body": {
+      "mode": "raw",
+      "raw": "{\n  \"reason\": \"Invalid content\"\n}"
+    },
+    "url": {
+      "raw": "http://localhost:5000/approval/reject/1",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "5000",
+      "path": ["approval", "reject", "1"]
+    }
+  }
+},
+
+{
+  "name": "Get Live Content",
+  "request": {
+    "method": "GET",
+    "url": {
+      "raw": "http://localhost:5000/content/live/1?subject=maths",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "5000",
+      "path": ["content", "live", "1"],
+      "query": [
+        { "key": "subject", "value": "maths" }
+      ]
+    }
+  }
+}
+
+]
+}
