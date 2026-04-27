@@ -125,3 +125,7 @@ This ensures continuous looping without storing state.
 
 * Student authentication is not required
 * Broadcasting is teacher-specific
+
+
+## 🌐 Live API Example
+https://content-broadcarsting-system.onrender.com/content/live/1?subject=maths

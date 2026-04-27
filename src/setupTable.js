@@ -41,6 +41,13 @@ CREATE TABLE IF NOT EXISTS content (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+CREATE TABLE content_slots (
+  id SERIAL PRIMARY KEY,
+  subject TEXT UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- CONTENT SCHEDULE TABLE
 CREATE TABLE IF NOT EXISTS content_schedule (
     id SERIAL PRIMARY KEY,
@@ -49,12 +56,6 @@ CREATE TABLE IF NOT EXISTS content_schedule (
     duration INT,
     slot_id INT REFERENCES content_slots(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE content_slots (
-  id SERIAL PRIMARY KEY,
-  subject TEXT UNIQUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- INDEXES

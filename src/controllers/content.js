@@ -13,23 +13,14 @@ exports.uploadContent = async (req, res) => {
       duration = 5
     } = req.body;
 
-    // Basic validation
+    // 🔹 Basic validation
     if (!title || !subject || !start_time || !end_time) {
       return res.status(400).json({ msg: "All fields are required" });
     }
 
+    // 🔹 File required check only (validation multer karega)
     if (!req.file) {
       return res.status(400).json({ msg: "File is required" });
-    }
-
-    // File validation
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-    if (!allowedTypes.includes(req.file.mimetype)) {
-      return res.status(400).json({ msg: "Invalid file type" });
-    }
-
-    if (req.file.size > 2 * 1024 * 1024) {
-      return res.status(400).json({ msg: "File too large (max 2MB)" });
     }
 
     const start = new Date(start_time);
@@ -39,7 +30,7 @@ exports.uploadContent = async (req, res) => {
       return res.status(400).json({ msg: "Invalid time range" });
     }
 
-    // Duplicate check (IMPORTANT)
+    // 🔹 Duplicate check
     const duplicate = await pool.query(
       `SELECT * FROM content 
        WHERE LOWER(title)=LOWER($1) 
@@ -52,17 +43,20 @@ exports.uploadContent = async (req, res) => {
       return res.status(400).json({ msg: "Duplicate content not allowed" });
     }
 
-    // Insert content
+    // 🔹 Clean file path (Windows fix)
+    const cleanPath = req.file.path.replace(/\\/g, "/");
+
+    // 🔹 Insert content
     const content = await createContent({
       title,
       subject,
-      file_path: req.file.path,
+      file_path: cleanPath,
       userId: req.user.id,
       start_time: start,
       end_time: end
     });
 
-    // Get or create slot
+    // 🔹 Slot handling
     let slotRes = await pool.query(
       "SELECT * FROM content_slots WHERE LOWER(subject)=LOWER($1)",
       [subject]
@@ -80,7 +74,7 @@ exports.uploadContent = async (req, res) => {
       slotId = slotRes.rows[0].id;
     }
 
-    // Auto rotation order
+    // 🔹 Rotation order
     let orderRes = await pool.query(
       "SELECT MAX(rotation_order) as max FROM content_schedule WHERE slot_id=$1",
       [slotId]
@@ -88,12 +82,11 @@ exports.uploadContent = async (req, res) => {
 
     const finalOrder = rotation_order || (orderRes.rows[0].max || 0) + 1;
 
-    // Duration validation
     if (duration <= 0) {
       return res.status(400).json({ msg: "Duration must be > 0" });
     }
 
-    // Insert schedule
+    // 🔹 Insert schedule
     await pool.query(
       `INSERT INTO content_schedule 
        (content_id, slot_id, rotation_order, duration)
@@ -126,5 +119,13 @@ exports.getLive = async (req, res) => {
     return res.json({ msg: "No content available" });
   }
 
-  res.json(content);
+  // ADD THIS PART
+  const cleanPath = content.file_path.replace(/\\/g, "/");
+
+  const fileUrl = `${req.protocol}://${req.get("host")}/${cleanPath}`;
+
+  res.json({
+    ...content,
+    file_url: fileUrl
+  });
 };

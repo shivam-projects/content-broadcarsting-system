@@ -8,6 +8,8 @@ const approvalRoute = require("./routes/action")
 app.use(express.json());
 app.use(cors());
 
+app.use("/uploads", express.static("uploads"));
+
 app.use("/auth", usersRoute);
 app.use("/content", contentRoute);
 app.use("/approval", approvalRoute);
