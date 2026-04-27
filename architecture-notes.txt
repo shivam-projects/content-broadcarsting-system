@@ -1,0 +1,128 @@
+ARCHITECTURE NOTES
+
+1. Authentication & RBAC
+
+* JWT-based authentication is implemented
+* Users have two roles: TEACHER and PRINCIPAL
+* Middleware (verifyToken) validates token
+* Middleware (allowRoles) restricts access based on role
+* Teachers can upload content
+* Principals can approve/reject content
+
+2. Subject-Based System Design
+
+* Content is grouped using subject
+* Each subject has a slot (content_slots table)
+* Scheduling is applied per subject
+* Public API filters content by teacher and subject
+
+3. Upload Handling
+
+* Multer is used for file uploads
+* Files are stored locally in uploads folder
+* File validation:
+
+  * Allowed types: jpg, png, gif
+  * Size limit enforced
+* Required fields:
+
+  * title, subject, start_time, end_time
+
+4. Approval Workflow
+
+* Content lifecycle:
+  uploaded → pending → approved/rejected
+* Only PRINCIPAL can review content
+* Reject requires reason
+* Approved content gets:
+
+  * approved_by
+  * approved_at
+* Only approved content is used in live API
+
+5. Scheduling & Rotation Logic (CORE)
+
+* Each content has duration (in minutes)
+
+* Total duration = sum of all scheduled content durations
+
+* Current time is taken using Date.now()
+
+* Time is converted into position using modulo:
+
+  position = currentTime % totalDuration
+
+* Loop is continuous and stateless
+
+* Content is selected based on cumulative duration
+
+This ensures:
+
+* No server memory required
+* Works across multiple requests
+* Scalable and consistent
+
+6. Database Design
+
+* users → authentication and roles
+* content → stores uploaded content
+* content_slots → subject grouping
+* content_schedule → rotation configuration
+
+Relationships:
+
+* content uploaded_by → users
+* content_schedule.content_id → content
+* content_schedule.slot_id → content_slots
+
+7. Folder Structure
+
+* controllers → request handling
+* routes → API endpoints
+* services → business logic (scheduling, content)
+* middlewares → auth, role, rate limit
+* config → database connection
+
+8. Middleware Usage
+
+* verifyToken → authentication
+* allowRoles → role-based access
+* multer → file upload
+* rateLimiter → API protection
+
+9. Public API Design
+
+* Endpoint: /content/live/:teacherId?subject=maths
+* No authentication required
+* Returns only:
+
+  * approved content
+  * within time window
+  * based on rotation logic
+* Returns empty response if no content available
+
+10. Edge Case Handling
+
+* No approved content → empty response
+* Invalid subject → empty response
+* Content outside time window → not shown
+* Duplicate content prevented at upload level
+
+11. Security Considerations
+
+* JWT validation
+* Password hashing (bcrypt)
+* Input validation
+* Sensitive data not exposed in API
+* Rate limiting applied on public API
+
+12. Scalability Approach
+
+* Stateless scheduling logic
+* Can scale horizontally (multiple servers)
+* Rate limiting prevents abuse
+* Future improvements:
+
+  * Redis caching for /live API
+  * Cloud storage (S3)
+  * Queue system for uploads
